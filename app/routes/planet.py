@@ -1,6 +1,7 @@
-# import flask
 from flask import Blueprint
 from app.models.planets import planets
+from app.routes.helpers import validate_planet
+
 
 planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
@@ -17,3 +18,15 @@ def get_all_planets():
         ))
         
     return all_planets
+
+
+# wave_2
+@planets_bp.get("/<id>")
+def get_one_planet(id):
+    planet = validate_planet(id)
+    return dict(
+            id = planet.id,
+            name = planet.name,
+            description = planet.description
+        )
+
