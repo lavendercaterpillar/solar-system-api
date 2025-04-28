@@ -1,6 +1,6 @@
-from flask import Blueprint,abort, make_response, request
+from flask import Blueprint,abort, make_response, request, Response
 from app.models.planets import Planet
-
+from app.routes.helpers import validate_planet
 from ..db import db
 
 
@@ -43,6 +43,41 @@ def get_all_planets():
             }
         )
     return planets_response
+
+
+# Wave_4
+@planets_bp.get("/<id>")
+def get_one_planet(id):
+    planet = validate_planet(id)
+
+    return {
+            "id": planet.id,
+            "name": planet.name,
+            "description": planet.description,
+            "moons_n" : planet.moons_n
+            }
+
+@planets_bp.put("/<id>")
+def update_planet(id):
+    planet = validate_planet(id)
+    request_body = request.get_json()
+
+    planet.name = request_body["name"]
+    planet.description = request_body["description"]
+    planet.moons_n = request_body["moons_n"]
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+@planets_bp.delete("/<id>")
+def delete_planet(id):
+    planet = validate_planet(id)
+    db.session.delete(planet)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
 
 
 
