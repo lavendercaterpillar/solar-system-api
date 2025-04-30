@@ -19,5 +19,3 @@ def validate_planet(id):
         abort(make_response(response, 404))
 
     return planet
-
-
