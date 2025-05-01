@@ -9,20 +9,12 @@ planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 @planets_bp.post("")
 def create_planet():
     request_body = request.get_json()
-    name = request_body["name"]
-    description = request_body["description"]
-    moons_n = request_body["moons_n"]
+    new_planet = Planet.from_dict(request_body)
 
-    new_planet = Planet(name=name, description=description, moons_n=moons_n)
     db.session.add(new_planet)
     db.session.commit()
 
-    response = {
-        "id": new_planet.id,
-        "name": new_planet.name,
-        "description": new_planet.description,
-        "moons_n": new_planet.moons_n
-    }
+    response = new_planet.to_dict()
     return response, 201
 
 @planets_bp.get("")
@@ -41,24 +33,9 @@ def get_all_planets():
 
     planets = db.session.scalars(query.order_by(Planet.id))
 
-    # or the below 2 lines:
-    # query = query.order_by(Planet.id)
-    # planets = db.session.scalars(query)
-    
-
-    # We could also write the line above as:
-    # planets = db.session.execute(query).scalars()
-
     planets_response = []
     for planet in planets:
-        planets_response.append(
-            {
-                "id": planet.id,
-                "name": planet.name,
-                "description": planet.description,
-                "moons_n" : planet.moons_n
-            }
-        )
+        planets_response.append(planet.to_dict())
     return planets_response
 
 
@@ -67,12 +44,7 @@ def get_all_planets():
 def get_one_planet(id):
     planet = validate_planet(id)
 
-    return {
-            "id": planet.id,
-            "name": planet.name,
-            "description": planet.description,
-            "moons_n" : planet.moons_n
-            }
+    return planet.to_dict()
 
 @planets_bp.put("/<id>")
 def update_planet(id):

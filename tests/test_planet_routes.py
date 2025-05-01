@@ -47,9 +47,9 @@ def test_get_two_planets(client, two_saved_planets):
             "description": saved_planet.description,
             "moons_n": saved_planet.moons_n
         })
-    #print(two_saved_planets)
-    #print(fixture_json)
-    #assert False
+    # print(two_saved_planets)
+    # print(fixture_json)
+    # assert False
     assert response.status_code == 200
     assert fixture_json == response_body
 
@@ -71,7 +71,8 @@ def test_create_one_planet(client):
         "description": "The Best!",
         "moons_n":2
     }
-# ..GET /one/planet with valid test data (fixtures) returns a 200 with an array including appropriate test data
+
+# 3..GET /one/planet with valid test data (fixtures) returns a 200 with an array including appropriate test data
 def test_get_one_planet(client, two_saved_planets):
     # Act
     response = client.get("/planets/1")
