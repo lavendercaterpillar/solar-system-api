@@ -33,6 +33,7 @@ def app():
 def client(app):
     return app.test_client()
 
+# wave_7
 
 @pytest.fixture
 def two_saved_planets(app):
@@ -49,3 +50,19 @@ def two_saved_planets(app):
     # db.session.add(ocean_planet)
     # db.session.add(mountain_planet)
     db.session.commit()
+
+    return [ocean_planet, mountain_planet]
+
+# GET /planets/1 returns a response body that matches our fixture
+@pytest.fixture
+def planet_with_id_1(app):
+    new_planet = Planet(id=1,
+                    name="New",
+                    description="green planet",
+                    moons_n=5)
+    db.session.add(new_planet)
+    db.session.commit()
+
+    return new_planet
+
+
