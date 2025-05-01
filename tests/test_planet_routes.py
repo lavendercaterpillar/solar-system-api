@@ -71,3 +71,17 @@ def test_create_one_planet(client):
         "description": "The Best!",
         "moons_n":2
     }
+# ..GET /one/planet with valid test data (fixtures) returns a 200 with an array including appropriate test data
+def test_get_one_planet(client, two_saved_planets):
+    # Act
+    response = client.get("/planets/1")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert response_body == {
+        "id": 1,
+        "name": "Earth",
+        "description": "blue planet",
+        "moons_n":1
+    }
