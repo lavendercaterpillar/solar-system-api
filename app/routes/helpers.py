@@ -4,18 +4,18 @@ from ..db import db
 
 
 
-def validate_planet(id):
+def validate_model(cls, model_id):
     try:
-        id = int(id)    
+        id = int(model_id)    
     except ValueError:
         response = {"message": f"planet id should be a number"}
         abort(make_response(response, 400))
 
-    query = db.select(Planet).where(Planet.id == id)
-    planet = db.session.scalar(query)    
+    query = db.select(cls).where(cls.id == model_id)
+    model = db.session.scalar(query)    
     
-    if not planet:
-        response = {"message": f"planet {id} not found"}
+    if not model:
+        response = {"message": f"planet {model_id} not found"}
         abort(make_response(response, 404))
 
-    return planet
+    return model

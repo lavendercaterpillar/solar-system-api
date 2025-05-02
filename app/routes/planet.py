@@ -1,6 +1,6 @@
 from flask import Blueprint,abort, make_response, request, Response
 from app.models.planets import Planet
-from app.routes.helpers import validate_planet
+from app.routes.helpers import validate_model
 from ..db import db
 
 
@@ -42,18 +42,21 @@ def get_all_planets():
 # Wave_4
 @planets_bp.get("/<id>")
 def get_one_planet(id):
-    planet = validate_planet(id)
+    planet = validate_model(Planet, id)
 
     return planet.to_dict()
 
 @planets_bp.put("/<id>")
 def update_planet(id):
-    planet = validate_planet(id)
+    planet = validate_model(Planet, id)
     request_body = request.get_json()
 
-    planet.name = request_body["name"]
-    planet.description = request_body["description"]
-    planet.moons_n = request_body["moons_n"]
+    # planet.name = request_body["name"]
+    # planet.description = request_body["description"]
+    # planet.moons_n = request_body["moons_n"]
+
+    # Three lines above can be replaced with a instance method
+    planet.update_from_dict(request_body)
 
     db.session.commit()
 
@@ -61,7 +64,7 @@ def update_planet(id):
 
 @planets_bp.delete("/<id>")
 def delete_planet(id):
-    planet = validate_planet(id)
+    planet = validate_model(Planet, id)
     db.session.delete(planet)
     db.session.commit()
 

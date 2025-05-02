@@ -23,7 +23,12 @@ class Planet(db.Model):
                                     moons_n=planet_data["moons_n"])
         return new_planet_instance
 
-
+    
+    def update_from_dict(self, book_data):
+        if "title" in book_data:
+            self.title = book_data["title"]
+        if "description" in book_data:
+            self.description = book_data["description"]
 
 
 
