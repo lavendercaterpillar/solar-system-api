@@ -11,7 +11,7 @@ class Planet(db.Model):
         planet_dict = {}
         planet_dict["id"] = self.id
         planet_dict["name"] = self.name
-        planet_dict["descriprion"] = self.description
+        planet_dict["description"] = self.description
         planet_dict["moons_n"] = self.moons_n
 
         return planet_dict
@@ -25,10 +25,12 @@ class Planet(db.Model):
 
     
     def update_from_dict(self, book_data):
-        if "title" in book_data:
-            self.title = book_data["title"]
+        if "name" in book_data:
+            self.title = book_data["name"]
         if "description" in book_data:
             self.description = book_data["description"]
+        if "moons_n" in book_data:
+            self.moons_n = book_data["moons_n"]
 
 
 

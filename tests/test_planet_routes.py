@@ -1,6 +1,4 @@
-from app.db import db
-from app.models.planets import Planet
-
+import pytest
 
 # Create a test to check GET /planets returns 200 and an empty array.
 def test_get_all_planets_with_no_records(client):
@@ -88,46 +86,146 @@ def test_get_one_planet(client, two_saved_planets):
         "moons_n":1
     }
 
+
 # wave_7
 
-def test_update_planet(client, two_saved_planets):
+def test_create_one_planet_no_name(client):
+    # Arrange
+    test_data = {"description": "The Best!"}
+
+    # Act
+    response = client.post("/planets", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {'message': 'Invalid request: missing name'}
+
+def test_create_one_planet_no_description(client):
+    # Arrange
+    test_data = {"name": "New Planet"}
+
+    # Act
+    response = client.post("/planets", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {'message': 'Invalid request: missing description'}
+
+def test_create_one_planet_with_extra_keys(client):
     # Arrange
     test_data = {
-        "title": "New planet",
-        "description": "The Best!"
+        "extra": "some stuff",
+        "name": "New Planet",
+        "description": "The Best!",
+        "another": "last value",
+        "moons_n": 4
     }
 
     # Act
-    response = client.put("/planets/1", json=test_data)
+    response = client.post("/planets", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 201
+    assert response_body == {
+        "id": 1,
+        "name": "New Planet",
+        "description": "The Best!",
+        "moons_n": 4
+
+    }
+
+# When we have records and a `name` query in the request arguments, `get_all_planets` returns a list containing only the `Planet`s that match the query
+def test_get_all_planets_with_name_query_matching_none(client, two_saved_planets):
+    # Act
+    data = {'name': 'Desert Planet'}
+    response = client.get("/planets", query_string = data)
     response_body = response.get_json()
 
     # Assert
     assert response.status_code == 200
-    assert response_body == "planet #1 successfully updated"
+    assert response_body == []
+
+# When we have records and a `name` query in the request arguments, `get_all_planets` returns a list containing only the `Planet`s that match the query
+def test_get_all_planets_with_name_query_matching_one(client, two_saved_planets):
+    # Act
+    data = {'name': 'Earth'}
+    response = client.get("/planets", query_string = data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 200
+    assert len(response_body) == 1
+    assert response_body[0] == {
+        "id": 1,
+        "name": "Earth",
+        "description": "blue planet",
+        "moons_n": 1
+    }
+
+# When we call `get_one_planet` with a numeric ID that doesn't have a record, we get the expected error message
+def test_get_one_planet_missing_record(client, two_saved_planets):
+    # Act
+    response = client.get("/planets/3")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Planet 3 not found"}
+
+# When we call `get_one_planet` with a non-numeric ID, we get the expected error message
+def test_get_one_planet_invalid_id(client, two_saved_planets):
+    # Act
+    response = client.get("/planets/cat")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Planet cat invalid"}
+
+def test_update_planet(client, two_saved_planets):
+    # Arrange
+    test_data = {
+        "name": "New planet",
+        "description": "The Best!",
+        "moons_n": 5
+    }
+
+    # Act
+    response = client.put("/planets/1", json=test_data)
+    #response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
 
 def test_update_planet_with_extra_keys(client, two_saved_planets):
     # Arrange
     test_data = {
         "extra": "some stuff",
-        "title": "New planet",
+        "name": "New planet",
         "description": "The Best!",
+        "moons_n": 5,
         "another": "last value"
     }
 
     # Act
     response = client.put("/planets/1", json=test_data)
-    response_body = response.get_json()
 
     # Assert
-    assert response.status_code == 200
-    assert response_body == "planet #1 successfully updated"
+    assert response.status_code == 204
+    assert response.content_length is None
 
 
 def test_update_planet_invalid_id(client, two_saved_planets):
     # Arrange
     test_data = {
-        "title": "New planet",
-        "description": "The Best!"
+        "name": "New planet",
+        "description": "The Best!",
+        "moons_n": 5
     }
 
     # Act
@@ -136,4 +234,63 @@ def test_update_planet_invalid_id(client, two_saved_planets):
 
     # Assert
     assert response.status_code == 400
-    assert response_body == {"message": "planet id should be a number"}
+    assert response_body == {"message": "Planet cat invalid"}
+
+def test_update_planet_missing_record(client, two_saved_planets):
+    # Arrange
+    test_data = {
+        "name": "New Planet",
+        "description": "The Best!",
+        "moons_n": 5
+
+    }
+
+    # Act
+    response = client.put("/planets/3", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Planet 3 not found"}
+
+def test_update_planet_invalid_id(client, two_saved_planets):
+    # Arrange
+    test_data = {
+        "name": "New Planet",
+        "description": "The Best!",
+        "moons_n": 5
+    }
+
+    # Act
+    response = client.put("/planets/cat", json=test_data)
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Planet cat invalid"}
+
+def test_delete_planet(client, two_saved_planets):
+    # Act
+    response = client.delete("/planets/1")
+
+    # Assert
+    assert response.status_code == 204
+    assert response.content_length is None
+
+def test_delete_planet_missing_record(client, two_saved_planets):
+    # Act
+    response = client.delete("/planets/3")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 404
+    assert response_body == {"message": "Planet 3 not found"}
+
+def test_delete_planet_invalid_id(client, two_saved_planets):
+    # Act
+    response = client.delete("/planets/cat")
+    response_body = response.get_json()
+
+    # Assert
+    assert response.status_code == 400
+    assert response_body == {"message": "Planet cat invalid"}

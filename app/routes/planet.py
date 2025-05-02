@@ -4,20 +4,26 @@ from app.routes.helpers import validate_model
 from ..db import db
 
 
-planets_bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
+bp = Blueprint("planets_bp", __name__, url_prefix="/planets")
 
-@planets_bp.post("")
+@bp.post("")
 def create_planet():
     request_body = request.get_json()
-    new_planet = Planet.from_dict(request_body)
+    
+    try:
+        new_planet = Planet.from_dict(request_body)
 
+    except KeyError as error:
+        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        abort(make_response(response, 400))
+        
     db.session.add(new_planet)
     db.session.commit()
 
     response = new_planet.to_dict()
     return response, 201
 
-@planets_bp.get("")
+@bp.get("")
 def get_all_planets():
 
     # query = db.select(Planet).order_by(Planet.id)
@@ -40,61 +46,28 @@ def get_all_planets():
 
 
 # Wave_4
-@planets_bp.get("/<id>")
+@bp.get("/<id>")
 def get_one_planet(id):
     planet = validate_model(Planet, id)
 
     return planet.to_dict()
 
-@planets_bp.put("/<id>")
+@bp.put("/<id>")
 def update_planet(id):
     planet = validate_model(Planet, id)
     request_body = request.get_json()
 
-    # planet.name = request_body["name"]
-    # planet.description = request_body["description"]
-    # planet.moons_n = request_body["moons_n"]
-
-    # Three lines above can be replaced with a instance method
     planet.update_from_dict(request_body)
 
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
 
-@planets_bp.delete("/<id>")
+@bp.delete("/<id>")
 def delete_planet(id):
     planet = validate_model(Planet, id)
     db.session.delete(planet)
     db.session.commit()
 
     return Response(status=204, mimetype="application/json")
-
-
-
-
-# # wave_1
-# @planets_bp.get("/")
-
-# def get_all_planets():
-#     all_planets = []
-#     for planet in planets:
-#         all_planets.append(dict(
-#             id = planet.id,
-#             name = planet.name,
-#             description = planet.description
-#         ))
-        
-#     return all_planets
-
-
-# # wave_2
-# @planets_bp.get("/<id>")
-# def get_one_planet(id):
-#     planet = validate_planet(id)
-#     return dict(
-#             id = planet.id,
-#             name = planet.name,
-#             description = planet.description
-#         )
 
