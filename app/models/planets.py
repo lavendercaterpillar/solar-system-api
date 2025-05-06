@@ -1,18 +1,31 @@
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
+from typing import Optional
 from ..db import db
 
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .moon import Moon
 class Planet(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str]
     description: Mapped[str]
     moons_n: Mapped[int]
+    moon_id: Mapped[Optional[int]] = mapped_column(ForeignKey("moon.id"))
+    moon: Mapped[Optional["Moon"]] = relationship(back_populates="planets")
+
 
     def to_dict(self):
         planet_dict = {}
         planet_dict["id"] = self.id
         planet_dict["name"] = self.name
         planet_dict["description"] = self.description
-        planet_dict["moon_n"] = self.moon_n
+        planet_dict["moons_n"] = self.moons_n
+            
+        if self.moon:
+            planet_dict["planet"] = self.moon
+        else:
+            planet_dict["planet"] = None
 
         return planet_dict
     
@@ -21,6 +34,7 @@ class Planet(db.Model):
         new_planet_instance = Planet(name=planet_data["name"], 
                                     description=planet_data["description"],
                                     moons_n=planet_data["moons_n"])
+        
         return new_planet_instance
 
     

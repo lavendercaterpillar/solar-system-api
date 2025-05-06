@@ -5,7 +5,7 @@ from flask.signals import request_finished
 from dotenv import load_dotenv
 import os
 from app.models.planets import Planet
-
+from app.models.moon import Moon
 
 load_dotenv()
 

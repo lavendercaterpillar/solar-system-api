@@ -7,9 +7,11 @@ from ..db import db
 
 bp = Blueprint("moon_bp", __name__, url_prefix="/moon")
 
-@bp.post("")
-def create_moon():
+@bp.post("/<moon_id>/planets")
+def create_planet_with_moon(moon_id):
     request_body = request.get_json()
+    moon = validate_model(Moon, moon_id)
+    request_body["moon_id"] = moon.id
     
     try:
         new_moon = Moon.from_dict(request_body)
@@ -46,5 +48,27 @@ def get_all_moons():
         moon_response.append(moon.to_dict())
     return moon_response
 
+@bp.get("/<id>")
+def get_one_moon(id):
+    moon = validate_model(Moon, id)
 
+    return moon.to_dict()
 
+@bp.put("/<id>")
+def update_moon(id):
+    moon = validate_model(Moon, id)
+    request_body = request.get_json()
+
+    moon.update_from_dict(request_body)
+
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
+
+@bp.delete("/<id>")
+def delete_moon(id):
+    moon = validate_model(Moon, id)
+    db.session.delete(moon)
+    db.session.commit()
+
+    return Response(status=204, mimetype="application/json")
