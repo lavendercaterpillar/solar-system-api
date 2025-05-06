@@ -1,7 +1,9 @@
 from flask import Flask
 from .db import db, migrate
-from .models import planets
+from .models import planets, moon
 from .routes.planet import bp as planets_bp
+from flask_sqlalchemy import SQLAlchemy
+from .routes.moon_routes import bp as moon_bp
 import os
 
 def create_app(test_config=None):
@@ -20,5 +22,6 @@ def create_app(test_config=None):
 
     # Register Blueprints here
     app.register_blueprint(planets_bp)
+    app.register_blueprint(moon_bp)
 
     return app
