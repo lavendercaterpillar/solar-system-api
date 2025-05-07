@@ -60,30 +60,33 @@ def test_to_dict_no_missing_data():
     test_data = Planet(id = 1,
                     name="Blue planet",
                     description="watr 4evr",
+                    moon = None,
                     moons_n=4)
 
     # Act
     result = test_data.to_dict()
     print(result)
     # Assert
-    assert len(result) == 4
+    assert len(result) == 5
     assert result["id"] == 1
     assert result["name"] == "Blue planet"
     assert result["description"] == "watr 4evr"
     assert result["moons_n"] == 4
+    assert result["moon"] == None
 
 
 def test_to_dict_missing_id():
     # Arrange
     test_data = Planet(name="Blue planet",
                     description="watr 4evr",
-                    moons_n=4)
+                    moons_n=4,
+                    moon = None)
 
     # Act
     result = test_data.to_dict()
 
     # Assert
-    assert len(result) == 4
+    assert len(result) == 5
     assert result["id"] is None
     assert result["name"] == "Blue planet"
     assert result["description"] == "watr 4evr"
@@ -93,30 +96,34 @@ def test_to_dict_missing_name():
     # Arrange
     test_data = Planet(id=1,
                     description="watr 4evr",
-                    moons_n=4)
+                    moons_n=4,
+                    moon = None)
 
     # Act
     result = test_data.to_dict()
 
     # Assert
-    assert len(result) == 4
+    assert len(result) == 5
     assert result["id"] == 1
     assert result["name"] is None
     assert result["description"] == "watr 4evr"
     assert result["moons_n"] == 4
+    assert result["moon"] == None
 
 def test_to_dict_missing_description():
     # Arrange
     test_data = Planet(id = 1,
                     name="Blue planet",
-                    moons_n=4)
+                    moons_n=4,
+                    moon = None)
 
     # Act
     result = test_data.to_dict()
 
     # Assert
-    assert len(result) == 4
+    assert len(result) == 5
     assert result["id"] == 1
     assert result["name"] == "Blue planet"
     assert result["description"] is None
     assert result["moons_n"] == 4
+    assert result["moon"] == None

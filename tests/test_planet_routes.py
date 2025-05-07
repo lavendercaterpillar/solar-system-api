@@ -44,7 +44,8 @@ def test_get_two_planets(client, two_saved_planets):
             "id": saved_planet.id,
             "name": saved_planet.name,
             "description": saved_planet.description,
-            "moons_n": saved_planet.moons_n
+            "moons_n": saved_planet.moons_n,
+            "moon": saved_planet.moon
         })
     # print(two_saved_planets)
     # print(fixture_json)
@@ -58,7 +59,7 @@ def test_create_one_planet(client):
     response = client.post("/planets", json={
         "name": "New planet",
         "description": "The Best!",
-        "moons_n":2
+        "moons_n":2,
     })
     response_body = response.get_json()
 
@@ -68,7 +69,8 @@ def test_create_one_planet(client):
         "id": 1,
         "name": "New planet",
         "description": "The Best!",
-        "moons_n":2
+        "moons_n":2,
+        "moon": None
     }
 
 # 3..GET /one/planet with valid test data (fixtures) returns a 200 with an array including appropriate test data
@@ -83,7 +85,8 @@ def test_get_one_planet(client, two_saved_planets):
         "id": 1,
         "name": "Earth",
         "description": "blue planet",
-        "moons_n":1
+        "moons_n":1,
+        "moon": None
     }
 
 
@@ -133,8 +136,8 @@ def test_create_one_planet_with_extra_keys(client):
         "id": 1,
         "name": "New Planet",
         "description": "The Best!",
-        "moons_n": 4
-
+        "moons_n": 4,
+        "moon": None
     }
 
 # When we have records and a `name` query in the request arguments, `get_all_planets` returns a list containing only the `Planet`s that match the query
@@ -162,7 +165,8 @@ def test_get_all_planets_with_name_query_matching_one(client, two_saved_planets)
         "id": 1,
         "name": "Earth",
         "description": "blue planet",
-        "moons_n": 1
+        "moons_n": 1,
+        "moon": None
     }
 
 # When we call `get_one_planet` with a numeric ID that doesn't have a record, we get the expected error message

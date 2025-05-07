@@ -24,14 +24,19 @@ class Planet(db.Model):
             
         if self.moon:
             planet_dict["moon"] = self.moon.description
+        else:
+            planet_dict["moon"] = None
 
         return planet_dict
     
     @classmethod
     def from_dict(cls, planet_data):
-        new_planet_instance = Planet(name=planet_data["name"], 
+        moon_id = planet_data.get("moon_id")
+
+        new_planet_instance = cls(name=planet_data["name"], 
                                     description=planet_data["description"],
-                                    moons_n=planet_data["moons_n"])
+                                    moons_n=planet_data["moons_n"],
+                                    moon_id=moon_id)
         
         return new_planet_instance
 

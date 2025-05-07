@@ -25,12 +25,13 @@ def create_moon():
     return response, 201
 
 
-@bp.post("/planets/<moon_id>")
+@bp.post("/<moon_id>/planets")
 def create_planet_with_moon(moon_id):
-    request_body = request.get_json()
     moon = validate_model(Moon, moon_id)
-    request_body["moon_id"] = moon.id
     
+    request_body = request.get_json()
+    request_body["moon_id"] = moon.id
+
     try:
         new_planet = Planet.from_dict(request_body)
 
@@ -67,11 +68,13 @@ def get_all_moons():
         moon_response.append(moon.to_dict())
     return moon_response
 
-@bp.get("/<id>")
-def get_one_moon(id):
-    moon = validate_model(Moon, id)
+@bp.get("/<moon_id>/planets")
+def get_moons_by_planet(moon_id):
+    moon = validate_model(Moon, moon_id)
 
-    return moon.to_dict()
+    response = [planet.to_dict() for planet in moon.planets]
+
+    return response
 
 @bp.put("/<id>")
 def update_moon(id):
