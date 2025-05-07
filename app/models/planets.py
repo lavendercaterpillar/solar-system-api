@@ -24,8 +24,6 @@ class Planet(db.Model):
             
         if self.moon:
             planet_dict["moon"] = self.moon.description
-        else:
-            planet_dict["moon"] = None
 
         return planet_dict
     
