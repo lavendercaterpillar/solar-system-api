@@ -7,6 +7,24 @@ from ..db import db
 
 bp = Blueprint("moon_bp", __name__, url_prefix="/moon")
 
+@bp.post("")
+def create_moon():
+    request_body = request.get_json()
+
+    try:
+        new_moon = Moon.from_dict(request_body)
+
+    except KeyError as error:
+        response = {"message": f"Invalid request: missing {error.args[0]}"}
+        abort(make_response(response, 400))
+        
+    db.session.add(new_moon)
+    db.session.commit()
+
+    response = new_moon.to_dict()
+    return response, 201
+
+
 @bp.post("/<moon_id>/planets")
 def create_planet_with_moon(moon_id):
     request_body = request.get_json()

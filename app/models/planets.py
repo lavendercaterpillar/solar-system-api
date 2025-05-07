@@ -23,9 +23,9 @@ class Planet(db.Model):
         planet_dict["moons_n"] = self.moons_n
             
         if self.moon:
-            planet_dict["planet"] = self.moon
+            planet_dict["moon"] = self.moon.description
         else:
-            planet_dict["planet"] = None
+            planet_dict["moon"] = None
 
         return planet_dict
     
